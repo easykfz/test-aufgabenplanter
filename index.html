@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aufgaben-Planer mit Karte</title>
+  <title>Baustellen-Planer mit Karte</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
     .task-marker {
@@ -15,82 +15,79 @@
       width: 20px;
       height: 20px;
     }
-
     .task-marker.completed {
       background: #10b981;
     }
-
     .task-marker.high {
       background: #ef4444;
     }
-
     .task-marker.medium {
       background: #f59e0b;
     }
   </style>
 </head>
 <body class="bg-gray-50 font-sans">
-<div class="max-w-md mx-auto bg-white min-h-screen">
+<div class="max-w-md mx-auto bg-white min-h-screen pb-20">
   <!-- Header -->
   <div class="bg-blue-600 text-white p-4 sticky top-0 z-50">
-    <h1 class="text-xl font-bold text-center">📍 Aufgaben-Planer</h1>
+    <h1 class="text-xl font-bold text-center">📍 Baustellen-Planer</h1>
     <div class="flex justify-center mt-2 space-x-1">
-      <button id="listViewBtn" class="px-2 py-1 bg-blue-500 rounded-full text-xs">📋 Liste</button>
-      <button id="mapViewBtn" class="px-2 py-1 bg-blue-700 rounded-full text-xs">🗺️ Karte</button>
-      <button id="calendarViewBtn" class="px-2 py-1 bg-blue-700 rounded-full text-xs">📅 Kalender
-      </button>
-      <button id="statsViewBtn" class="px-2 py-1 bg-blue-700 rounded-full text-xs">💰 Kosten</button>
+      <button id="listViewBtn" class="px-2 py-1 bg-blue-500 text-white text-xs" style="border-radius: 8px;">📋 Liste</button>
+      <button id="mapViewBtn" class="px-2 py-1 bg-blue-100 text-blue-600 text-xs" style="border-radius: 8px;">🗺️ Karte</button>
+      <button id="calendarViewBtn" class="px-2 py-1 bg-blue-100 text-blue-600 text-xs" style="border-radius: 8px;">📅 Kalender</button>
+      <button id="statsViewBtn" class="px-2 py-1 bg-blue-100 text-blue-600 text-xs" style="border-radius: 8px;">📊 Statistik</button>
     </div>
-  </div>
-  <!-- Add Task Toggle Button -->
-  <div class="p-4 bg-white border-b">
-    <button id="toggleFormBtn"
-            class="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium flex items-center justify-center space-x-2">
-      <span>➕ Neue Aufgabe</span>
-    </button>
   </div>
 
   <!-- Add Task Form -->
   <div id="addTaskForm" class="hidden p-4 bg-white border-b">
     <div class="space-y-3">
+      <input type="text" id="taskName" placeholder="Name des Kunden..."
+             class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" style="border-radius: 8px;">
+
       <input type="text" id="taskTitle" placeholder="Aufgabe eingeben..."
-             class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+             class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" style="border-radius: 8px;">
 
-      <input type="text" id="taskLocation" placeholder="Adresse (z.B. Alexanderplatz 1, Berlin)..."
-             class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+      <div class="relative">
+        <input type="text" id="taskLocation" placeholder="Adresse (z.B. Alexanderplatz 1, Berlin)..."
+               class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" style="border-radius: 8px;"
+               autocomplete="off">
+        <div id="addressSuggestions" class="absolute z-50 w-full bg-white border border-gray-300 rounded-lg shadow-lg mt-1 max-h-60 overflow-y-auto hidden" style="border-radius: 8px;">
+          <!-- Address suggestions will appear here -->
+        </div>
+      </div>
 
-      <input type="number" id="taskCustomerPrice" placeholder="Kundenpreis in € (optional)"
-             step="0.01" min="0"
-             class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+      <input type="number" id="taskCustomerPrice" placeholder="Kundenpreis in € (optional)" step="0.01" min="0"
+             class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" style="border-radius: 8px;">
 
-      <input type="number" id="taskSpareParts" placeholder="Ersatzteile in € (optional)" step="0.01"
-             min="0"
-             class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+      <input type="number" id="taskSpareParts" placeholder="Ersatzteile in € (optional)" step="0.01" min="0"
+             class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" style="border-radius: 8px;">
 
       <input type="tel" id="taskPhone" placeholder="Telefonnummer (optional)"
-             class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+             class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" style="border-radius: 8px;">
 
-      <div class="w-full p-3 border rounded-lg bg-gray-50">
+      <input type="date" id="taskDate"
+             class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" style="border-radius: 8px;"
+             title="Geplantes Datum (optional)">
+
+      <div class="w-full p-3 border rounded-lg bg-gray-50" style="border-radius: 8px;">
         <span class="text-gray-600">Einnahmen: </span>
         <span id="calculatedEarnings" class="font-bold text-green-600">0,00 €</span>
       </div>
 
       <div class="flex space-x-2">
-        <select id="taskPriority"
-                class="flex-1 p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
+        <select id="taskPriority" class="flex-1 p-3 border rounded-lg focus:ring-2 focus:ring-blue-500" style="border-radius: 8px;">
           <option value="low">🔵 Offen</option>
           <option value="medium">🟢 Geplant</option>
           <option value="high">🔴 Dringend</option>
         </select>
 
-        <button id="addTaskBtn"
-                class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium">
+        <button id="addTaskBtn" class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium" style="border-radius: 8px;">
           ➕ Hinzufügen
         </button>
       </div>
 
-      <button id="cancelFormBtn"
-              class="w-full px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 font-medium">
+      <button id="cancelFormBtn" class="w-full px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 font-medium" style="border-radius: 8px;">
         ❌ Abbrechen
       </button>
     </div>
@@ -100,45 +97,52 @@
   <div id="editTaskForm" class="hidden p-4 bg-white border-b">
     <h3 class="text-lg font-bold mb-3 text-blue-600">✏️ Aufgabe bearbeiten</h3>
     <div class="space-y-3">
+      <input type="text" id="editTaskName" placeholder="Name des Kunden..."
+             class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" style="border-radius: 8px;">
+
       <input type="text" id="editTaskTitle" placeholder="Aufgabe eingeben..."
-             class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+             class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" style="border-radius: 8px;">
 
-      <input type="text" id="editTaskLocation"
-             placeholder="Adresse (z.B. Alexanderplatz 1, Berlin)..."
-             class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+      <div class="relative">
+        <input type="text" id="editTaskLocation" placeholder="Adresse (z.B. Alexanderplatz 1, Berlin)..."
+               class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" style="border-radius: 8px;"
+               autocomplete="off">
+        <div id="editAddressSuggestions" class="absolute z-50 w-full bg-white border border-gray-300 rounded-lg shadow-lg mt-1 max-h-60 overflow-y-auto hidden" style="border-radius: 8px;">
+          <!-- Address suggestions will appear here -->
+        </div>
+      </div>
 
-      <input type="number" id="editTaskCustomerPrice" placeholder="Kundenpreis in € (optional)"
-             step="0.01" min="0"
-             class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+      <input type="number" id="editTaskCustomerPrice" placeholder="Kundenpreis in € (optional)" step="0.01" min="0"
+             class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" style="border-radius: 8px;">
 
-      <input type="number" id="editTaskSpareParts" placeholder="Ersatzteile in € (optional)"
-             step="0.01" min="0"
-             class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+      <input type="number" id="editTaskSpareParts" placeholder="Ersatzteile in € (optional)" step="0.01" min="0"
+             class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" style="border-radius: 8px;">
 
       <input type="tel" id="editTaskPhone" placeholder="Telefonnummer (optional)"
-             class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+             class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" style="border-radius: 8px;">
 
-      <div class="w-full p-3 border rounded-lg bg-gray-50">
+      <input type="date" id="editTaskDate"
+             class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" style="border-radius: 8px;"
+             title="Geplantes Datum (optional)">
+
+      <div class="w-full p-3 border rounded-lg bg-gray-50" style="border-radius: 8px;">
         <span class="text-gray-600">Einnahmen: </span>
         <span id="editCalculatedEarnings" class="font-bold text-green-600">0,00 €</span>
       </div>
 
       <div class="flex space-x-2">
-        <select id="editTaskPriority"
-                class="flex-1 p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
+        <select id="editTaskPriority" class="flex-1 p-3 border rounded-lg focus:ring-2 focus:ring-blue-500" style="border-radius: 8px;">
           <option value="low">🔵 Offen</option>
           <option value="medium">🟢 Geplant</option>
           <option value="high">🔴 Dringend</option>
         </select>
 
-        <button id="saveTaskBtn"
-                class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium">
+        <button id="saveTaskBtn" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium" style="border-radius: 8px;">
           💾 Speichern
         </button>
       </div>
 
-      <button id="cancelEditBtn"
-              class="w-full px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 font-medium">
+      <button id="cancelEditBtn" class="w-full px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 font-medium" style="border-radius: 8px;">
         ❌ Abbrechen
       </button>
     </div>
@@ -146,6 +150,17 @@
 
   <!-- List View -->
   <div id="listView" class="p-4">
+    <!-- Task Filter Tabs -->
+    <div class="mb-6">
+      <div class="flex justify-center mb-4 space-x-1 overflow-x-auto">
+        <button id="allTasksBtn" class="px-3 py-2 bg-blue-100 text-blue-600 text-xs whitespace-nowrap" style="border-radius: 8px;">📋 Alle</button>
+        <button id="openTasksBtn" class="px-3 py-2 bg-blue-500 text-white text-xs whitespace-nowrap" style="border-radius: 8px;">🔵 Offen</button>
+        <button id="plannedTasksBtn" class="px-3 py-2 bg-blue-100 text-blue-600 text-xs whitespace-nowrap" style="border-radius: 8px;">🟢 Geplant</button>
+        <button id="urgentTasksBtn" class="px-3 py-2 bg-blue-100 text-blue-600 text-xs whitespace-nowrap" style="border-radius: 8px;">🔴 Dringend</button>
+        <button id="completedTasksBtn" class="px-3 py-2 bg-blue-100 text-blue-600 text-xs whitespace-nowrap" style="border-radius: 8px;">✅ Erledigt</button>
+      </div>
+    </div>
+
     <div id="taskList" class="space-y-3">
       <!-- Tasks will be added here -->
     </div>
@@ -154,8 +169,7 @@
         <div class="text-4xl">📝</div>
       </div>
       <h3 class="text-lg font-semibold text-gray-700 mb-2">Keine Aufgaben vorhanden</h3>
-      <p class="text-sm text-gray-500 mb-6">Fügen Sie Ihre erste Aufgabe hinzu und beginnen Sie mit
-        der Planung!</p>
+      <p class="text-sm text-gray-500 mb-6">Fügen Sie Ihre erste Aufgabe hinzu und beginnen Sie mit der Planung!</p>
       <button onclick="document.getElementById('toggleFormBtn').click()"
               class="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 font-medium">
         ➕ Erste Aufgabe erstellen
@@ -165,15 +179,13 @@
 
   <!-- Map View -->
   <div id="mapView" class="hidden">
-    <div id="map" style="height: calc(100vh - 140px); width: 100%;"></div>
+    <div id="map" style="height: calc(100vh - 220px); width: 100%;"></div>
     <div class="p-4 bg-white border-t">
       <div class="flex justify-between items-center text-sm">
         <div class="flex items-center space-x-3 text-xs">
           <span class="flex items-center"><span class="w-3 h-3 bg-red-500 rounded-full mr-1"></span> Dringend</span>
-          <span class="flex items-center"><span
-              class="w-3 h-3 bg-green-500 rounded-full mr-1"></span> Geplant</span>
-          <span class="flex items-center"><span
-              class="w-3 h-3 bg-blue-500 rounded-full mr-1"></span> Offen</span>
+          <span class="flex items-center"><span class="w-3 h-3 bg-green-500 rounded-full mr-1"></span> Geplant</span>
+          <span class="flex items-center"><span class="w-3 h-3 bg-blue-500 rounded-full mr-1"></span> Offen</span>
         </div>
         <span id="taskCount" class="text-gray-600">0 Aufgaben</span>
       </div>
@@ -185,23 +197,15 @@
     <div class="mb-4">
       <!-- Calendar View Toggle -->
       <div class="flex justify-center mb-4 space-x-1">
-        <button id="monthViewBtn" class="px-3 py-1 bg-blue-500 text-white rounded-full text-xs">📅
-          Monat
-        </button>
-        <button id="weekViewBtn" class="px-3 py-1 bg-blue-700 text-white rounded-full text-xs">📆
-          Woche
-        </button>
-        <button id="dayViewBtn" class="px-3 py-1 bg-blue-700 text-white rounded-full text-xs">📋
-          Tag
-        </button>
+        <button id="monthViewBtn" class="px-3 py-1 bg-blue-500 text-white text-xs" style="border-radius: 8px;">📅 Monat</button>
+        <button id="weekViewBtn" class="px-3 py-1 bg-blue-100 text-blue-600 text-xs" style="border-radius: 8px;">📆 Woche</button>
+        <button id="dayViewBtn" class="px-3 py-1 bg-blue-100 text-blue-600 text-xs" style="border-radius: 8px;">📋 Tag</button>
       </div>
 
       <div class="flex justify-between items-center mb-4">
-        <button id="prevPeriod" class="p-2 bg-blue-500 text-white rounded hover:bg-blue-600">‹
-        </button>
+        <button id="prevPeriod" class="p-2 bg-blue-500 text-white hover:bg-blue-600" style="border-radius: 8px;">‹</button>
         <h3 id="currentPeriod" class="text-lg font-bold"></h3>
-        <button id="nextPeriod" class="p-2 bg-blue-500 text-white rounded hover:bg-blue-600">›
-        </button>
+        <button id="nextPeriod" class="p-2 bg-blue-500 text-white hover:bg-blue-600" style="border-radius: 8px;">›</button>
       </div>
 
       <!-- Month View -->
@@ -246,17 +250,15 @@
       </div>
     </div>
 
-    <div class="bg-white border rounded-xl p-5 shadow-sm">
+    <div class="bg-white border p-5 shadow-sm" style="border-radius: 8px;">
       <div class="flex items-center justify-between mb-4">
         <h4 class="text-lg font-bold text-gray-800 flex items-center">
-          <span class="bg-blue-100 p-2 rounded-lg mr-3">📋</span>
+          <span class="bg-blue-100 p-2 mr-3" style="border-radius: 8px;">📋</span>
           Ungeplante Aufgaben
         </h4>
-        <span id="unplannedCount"
-              class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm font-medium">0</span>
+        <span id="unplannedCount" class="px-3 py-1 bg-gray-100 text-gray-600 text-sm font-medium" style="border-radius: 8px;">0</span>
       </div>
-      <div id="unplannedTasks"
-           class="space-y-3 min-h-[120px] border-2 border-dashed border-gray-300 rounded-lg p-4 bg-gray-50">
+      <div id="unplannedTasks" class="space-y-3 min-h-[120px] border-2 border-dashed border-gray-300 p-4 bg-gray-50" style="border-radius: 8px;">
         <!-- Unplanned tasks will be shown here -->
       </div>
     </div>
@@ -265,27 +267,27 @@
   <!-- Statistics View -->
   <div id="statsView" class="hidden p-4">
     <div class="space-y-4">
-      <div class="bg-gradient-to-r from-green-500 to-green-600 text-white p-4 rounded-lg">
+      <div class="bg-gradient-to-r from-green-500 to-green-600 text-white p-4" style="border-radius: 8px;">
         <h3 class="text-lg font-bold mb-2">💰 Einnahmenübersicht</h3>
         <div class="text-2xl font-bold" id="totalCosts">0,00 €</div>
         <div class="text-sm opacity-90">Gesamteinnahmen erledigter Aufgaben</div>
       </div>
 
-      <div class="bg-white border rounded-lg p-4">
+      <div class="bg-white border p-4" style="border-radius: 8px;">
         <h4 class="font-bold mb-3">📊 Monatliche Übersicht</h4>
         <div id="monthlyStats" class="space-y-2">
           <!-- Monthly stats will be added here -->
         </div>
       </div>
 
-      <div class="bg-white border rounded-lg p-4">
+      <div class="bg-white border p-4" style="border-radius: 8px;">
         <h4 class="font-bold mb-3">📈 Aktuelle Statistiken</h4>
         <div class="grid grid-cols-2 gap-4 text-center">
-          <div class="bg-blue-50 p-3 rounded">
+          <div class="bg-blue-50 p-3" style="border-radius: 8px;">
             <div class="text-2xl font-bold text-blue-600" id="openTasks">0</div>
             <div class="text-sm text-gray-600">Offene Aufgaben</div>
           </div>
-          <div class="bg-green-50 p-3 rounded">
+          <div class="bg-green-50 p-3" style="border-radius: 8px;">
             <div class="text-2xl font-bold text-green-600" id="completedTasks">0</div>
             <div class="text-sm text-gray-600">Erledigt</div>
           </div>
@@ -293,6 +295,22 @@
       </div>
     </div>
   </div>
+
+  <!-- Task Modal -->
+  <div id="taskModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+      <div id="taskModalContent">
+        <!-- Task details will be loaded here -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Fixed Add Task Button -->
+<div class="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50">
+  <button id="toggleFormBtn" class="px-6 py-3 bg-blue-600 text-white hover:bg-blue-700 font-medium flex items-center justify-center space-x-2 shadow-lg" style="border-radius: 8px;">
+    <span>➕ Neue Aufgabe</span>
+  </button>
 </div>
 
 <script>
@@ -303,6 +321,7 @@
   let draggedTask = null;
   let editingTaskId = null;
   let calendarViewMode = 'month'; // 'month', 'week', 'day'
+  let currentFilter = 'open'; // 'all', 'open', 'planned', 'urgent', 'completed'
 
   // LocalStorage functions
   function saveTasksToStorage() {
@@ -325,12 +344,14 @@
     }
   }
 
+  // Address suggestion variables
+  let addressSuggestionTimeout = null;
+  let currentSuggestionInput = null;
+
   // Geocoding function to get coordinates from address
   async function geocodeAddress(address) {
     try {
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
-          address)}&limit=1`);
+      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`);
       const data = await response.json();
 
       if (data && data.length > 0) {
@@ -347,8 +368,140 @@
     }
   }
 
+  // Address suggestion function
+  async function searchAddressSuggestions(query, suggestionsContainer) {
+    if (query.length < 3) {
+      suggestionsContainer.classList.add('hidden');
+      return;
+    }
+
+    try {
+      // Prioritize Austria and Germany in search
+      const countryBias = '&countrycodes=at,de';
+      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}${countryBias}&limit=8&addressdetails=1`);
+      const data = await response.json();
+
+      if (data && data.length > 0) {
+        displayAddressSuggestions(data, suggestionsContainer);
+      } else {
+        suggestionsContainer.classList.add('hidden');
+      }
+    } catch (error) {
+      console.error('Address suggestion error:', error);
+      suggestionsContainer.classList.add('hidden');
+    }
+  }
+
+  function displayAddressSuggestions(suggestions, container) {
+    // Sort suggestions: Austria first, then Germany, then others
+    const sortedSuggestions = suggestions.sort((a, b) => {
+      const countryA = a.address?.country || '';
+      const countryB = b.address?.country || '';
+
+      const isAustriaA = countryA === 'Österreich' || countryA === 'Austria';
+      const isAustriaB = countryB === 'Österreich' || countryB === 'Austria';
+      const isGermanyA = countryA === 'Deutschland' || countryA === 'Germany';
+      const isGermanyB = countryB === 'Deutschland' || countryB === 'Germany';
+
+      if (isAustriaA && !isAustriaB) return -1;
+      if (!isAustriaA && isAustriaB) return 1;
+      if (isGermanyA && !isGermanyB && !isAustriaB) return -1;
+      if (!isGermanyA && isGermanyB && !isAustriaA) return 1;
+
+      return 0;
+    });
+
+    container.innerHTML = sortedSuggestions.map(suggestion => {
+      const address = suggestion.display_name;
+      const country = suggestion.address?.country || '';
+      const countryFlag = country === 'Österreich' || country === 'Austria' ? '🇦🇹' :
+        country === 'Deutschland' || country === 'Germany' ? '🇩🇪' : '🌍';
+
+      // Extract city/town from address components
+      const city = suggestion.address?.city ||
+        suggestion.address?.town ||
+        suggestion.address?.village ||
+        suggestion.address?.municipality ||
+        suggestion.name ||
+        suggestion.display_name.split(',')[0];
+
+      // Create shortened preview (city + country)
+      const shortPreview = `${city}, ${country}`;
+
+      return `
+                <div class="p-3 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0 suggestion-item"
+                     data-address="${address}"
+                     data-lat="${suggestion.lat}"
+                     data-lon="${suggestion.lon}">
+                    <div class="flex items-start space-x-2">
+                        <span class="text-lg mt-0.5">${countryFlag}</span>
+                        <div class="flex-1 min-w-0">
+                            <div class="font-medium text-gray-900 truncate">${suggestion.name || suggestion.display_name.split(',')[0]}</div>
+                            <div class="text-sm text-gray-600 truncate">${shortPreview}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+    }).join('');
+
+    container.classList.remove('hidden');
+
+    // Add click handlers to suggestions
+    container.querySelectorAll('.suggestion-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const address = item.getAttribute('data-address');
+        currentSuggestionInput.value = address;
+        container.classList.add('hidden');
+        currentSuggestionInput.focus();
+      });
+    });
+  }
+
+  function setupAddressSuggestions(inputId, suggestionsId) {
+    const input = document.getElementById(inputId);
+    const suggestions = document.getElementById(suggestionsId);
+
+    input.addEventListener('input', (e) => {
+      currentSuggestionInput = input;
+      const query = e.target.value.trim();
+
+      // Clear previous timeout
+      if (addressSuggestionTimeout) {
+        clearTimeout(addressSuggestionTimeout);
+      }
+
+      // Debounce the search
+      addressSuggestionTimeout = setTimeout(() => {
+        searchAddressSuggestions(query, suggestions);
+      }, 300);
+    });
+
+    input.addEventListener('focus', () => {
+      currentSuggestionInput = input;
+      if (input.value.length >= 3) {
+        searchAddressSuggestions(input.value.trim(), suggestions);
+      }
+    });
+
+    input.addEventListener('blur', (e) => {
+      // Delay hiding to allow clicking on suggestions
+      setTimeout(() => {
+        if (!suggestions.matches(':hover')) {
+          suggestions.classList.add('hidden');
+        }
+      }, 150);
+    });
+
+    // Hide suggestions when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!input.contains(e.target) && !suggestions.contains(e.target)) {
+        suggestions.classList.add('hidden');
+      }
+    });
+  }
+
   // Initialize
-  document.addEventListener('DOMContentLoaded', function () {
+  document.addEventListener('DOMContentLoaded', function() {
     loadTasksFromStorage();
     initializeMap();
     updateTaskDisplay();
@@ -361,8 +514,7 @@
     document.getElementById('cancelEditBtn').addEventListener('click', hideEditForm);
     document.getElementById('listViewBtn').addEventListener('click', () => switchView('list'));
     document.getElementById('mapViewBtn').addEventListener('click', () => switchView('map'));
-    document.getElementById('calendarViewBtn').addEventListener('click',
-      () => switchView('calendar'));
+    document.getElementById('calendarViewBtn').addEventListener('click', () => switchView('calendar'));
     document.getElementById('statsViewBtn').addEventListener('click', () => switchView('stats'));
 
     // Calendar navigation
@@ -370,31 +522,34 @@
     document.getElementById('nextPeriod').addEventListener('click', () => changePeriod(1));
 
     // Calendar view mode buttons
-    document.getElementById('monthViewBtn').addEventListener('click',
-      () => switchCalendarView('month'));
-    document.getElementById('weekViewBtn').addEventListener('click',
-      () => switchCalendarView('week'));
-    document.getElementById('dayViewBtn').addEventListener('click',
-      () => switchCalendarView('day'));
+    document.getElementById('monthViewBtn').addEventListener('click', () => switchCalendarView('month'));
+    document.getElementById('weekViewBtn').addEventListener('click', () => switchCalendarView('week'));
+    document.getElementById('dayViewBtn').addEventListener('click', () => switchCalendarView('day'));
+
+    // Task filter buttons
+    document.getElementById('allTasksBtn').addEventListener('click', () => setTaskFilter('all'));
+    document.getElementById('openTasksBtn').addEventListener('click', () => setTaskFilter('open'));
+    document.getElementById('plannedTasksBtn').addEventListener('click', () => setTaskFilter('planned'));
+    document.getElementById('urgentTasksBtn').addEventListener('click', () => setTaskFilter('urgent'));
+    document.getElementById('completedTasksBtn').addEventListener('click', () => setTaskFilter('completed'));
 
     // Enter key support
-    document.getElementById('taskTitle').addEventListener('keypress', function (e) {
-      if (e.key === 'Enter') {
-        addTask();
-      }
+    document.getElementById('taskTitle').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') addTask();
     });
-    document.getElementById('taskLocation').addEventListener('keypress', function (e) {
-      if (e.key === 'Enter') {
-        addTask();
-      }
+    document.getElementById('taskLocation').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') addTask();
     });
 
     // Calculate earnings when prices change
     document.getElementById('taskCustomerPrice').addEventListener('input', calculateEarnings);
     document.getElementById('taskSpareParts').addEventListener('input', calculateEarnings);
-    document.getElementById('editTaskCustomerPrice').addEventListener('input',
-      calculateEditEarnings);
+    document.getElementById('editTaskCustomerPrice').addEventListener('input', calculateEditEarnings);
     document.getElementById('editTaskSpareParts').addEventListener('input', calculateEditEarnings);
+
+    // Setup address suggestions
+    setupAddressSuggestions('taskLocation', 'addressSuggestions');
+    setupAddressSuggestions('editTaskLocation', 'editAddressSuggestions');
   });
 
   function initializeMap() {
@@ -428,11 +583,13 @@
     toggleBtn.innerHTML = '<span>➕ Neue Aufgabe</span>';
 
     // Clear form
+    document.getElementById('taskName').value = '';
     document.getElementById('taskTitle').value = '';
     document.getElementById('taskLocation').value = '';
     document.getElementById('taskCustomerPrice').value = '';
     document.getElementById('taskSpareParts').value = '';
     document.getElementById('taskPhone').value = '';
+    document.getElementById('taskDate').value = '';
     document.getElementById('taskPriority').value = 'low';
     calculateEarnings();
   }
@@ -443,8 +600,7 @@
     const earnings = customerPrice - spareParts;
 
     document.getElementById('calculatedEarnings').textContent = earnings.toFixed(2) + ' €';
-    document.getElementById('calculatedEarnings').className = earnings >= 0
-      ? 'font-bold text-green-600' : 'font-bold text-red-600';
+    document.getElementById('calculatedEarnings').className = earnings >= 0 ? 'font-bold text-green-600' : 'font-bold text-red-600';
   }
 
   function calculateEditEarnings() {
@@ -453,21 +609,22 @@
     const earnings = customerPrice - spareParts;
 
     document.getElementById('editCalculatedEarnings').textContent = earnings.toFixed(2) + ' €';
-    document.getElementById('editCalculatedEarnings').className = earnings >= 0
-      ? 'font-bold text-green-600' : 'font-bold text-red-600';
+    document.getElementById('editCalculatedEarnings').className = earnings >= 0 ? 'font-bold text-green-600' : 'font-bold text-red-600';
   }
 
   async function addTask() {
+    const name = document.getElementById('taskName').value.trim();
     const title = document.getElementById('taskTitle').value.trim();
     const location = document.getElementById('taskLocation').value.trim();
     const customerPrice = parseFloat(document.getElementById('taskCustomerPrice').value) || 0;
     const spareParts = parseFloat(document.getElementById('taskSpareParts').value) || 0;
     const phone = document.getElementById('taskPhone').value.trim();
+    const plannedDate = document.getElementById('taskDate').value || null;
     const earnings = customerPrice - spareParts;
     const priority = document.getElementById('taskPriority').value;
 
-    if (!title || !location) {
-      alert('Bitte füllen Sie Titel und Adresse aus!');
+    if (!name || !title || !location) {
+      alert('Bitte füllen Sie Name, Titel und Adresse aus!');
       return;
     }
 
@@ -486,8 +643,12 @@
         return;
       }
 
+      // Automatically set status to "planned" if a date is provided
+      const finalPriority = plannedDate && priority !== 'high' ? 'medium' : priority;
+
       const task = {
         id: Date.now(),
+        name: name,
         title: title,
         location: location,
         fullAddress: geocodeResult.displayName,
@@ -495,12 +656,12 @@
         spareParts: spareParts,
         phone: phone,
         earnings: earnings,
-        priority: priority,
+        priority: finalPriority,
         completed: false,
         coordinates: [geocodeResult.lat, geocodeResult.lng],
         createdAt: new Date().toLocaleDateString('de-DE'),
         completedAt: null,
-        plannedDate: null
+        plannedDate: plannedDate
       };
 
       tasks.push(task);
@@ -545,9 +706,7 @@
   }
 
   function makePhoneCall(phoneNumber) {
-    if (!phoneNumber) {
-      return;
-    }
+    if (!phoneNumber) return;
 
     // Clean phone number (remove spaces, dashes, etc.)
     const cleanNumber = phoneNumber.replace(/[^\\d+]/g, '');
@@ -562,9 +721,7 @@
   }
 
   function openWhatsApp(phoneNumber) {
-    if (!phoneNumber) {
-      return;
-    }
+    if (!phoneNumber) return;
 
     // Clean phone number and ensure it starts with country code
     let cleanNumber = phoneNumber.replace(/[^\\d+]/g, '');
@@ -585,13 +742,49 @@
     window.open(whatsappUrl, '_blank');
   }
 
-  function showContactOptions(phoneNumber) {
-    if (!phoneNumber) {
-      return;
+  function copyToClipboard(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(() => {
+        // Show temporary feedback
+        const feedback = document.createElement('div');
+        feedback.textContent = 'Nummer kopiert!';
+        feedback.className = 'fixed top-20 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-2 rounded-lg z-50 text-sm';
+        document.body.appendChild(feedback);
+        setTimeout(() => feedback.remove(), 2000);
+      }).catch(() => {
+        fallbackCopyTextToClipboard(text);
+      });
+    } else {
+      fallbackCopyTextToClipboard(text);
     }
+  }
 
-    const options = confirm(
-      `Telefonnummer: ${phoneNumber}\\n\\nOK = Anrufen\\nAbbrechen = WhatsApp`);
+  function fallbackCopyTextToClipboard(text) {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.style.top = "0";
+    textArea.style.left = "0";
+    textArea.style.position = "fixed";
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    try {
+      document.execCommand('copy');
+      const feedback = document.createElement('div');
+      feedback.textContent = 'Nummer kopiert!';
+      feedback.className = 'fixed top-20 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-2 rounded-lg z-50 text-sm';
+      document.body.appendChild(feedback);
+      setTimeout(() => feedback.remove(), 2000);
+    } catch (err) {
+      console.error('Fallback: Oops, unable to copy', err);
+    }
+    document.body.removeChild(textArea);
+  }
+
+  function showContactOptions(phoneNumber) {
+    if (!phoneNumber) return;
+
+    const options = confirm(`Telefonnummer: ${phoneNumber}\\n\\nOK = Anrufen\\nAbbrechen = WhatsApp`);
 
     if (options) {
       makePhoneCall(phoneNumber);
@@ -612,9 +805,7 @@
 
   function editTask(taskId) {
     const task = tasks.find(t => t.id === taskId);
-    if (!task) {
-      return;
-    }
+    if (!task) return;
 
     editingTaskId = taskId;
 
@@ -622,11 +813,13 @@
     hideTaskForm();
 
     // Fill edit form with current task data
+    document.getElementById('editTaskName').value = task.name || '';
     document.getElementById('editTaskTitle').value = task.title;
     document.getElementById('editTaskLocation').value = task.location;
     document.getElementById('editTaskCustomerPrice').value = task.customerPrice || '';
     document.getElementById('editTaskSpareParts').value = task.spareParts || '';
     document.getElementById('editTaskPhone').value = task.phone || '';
+    document.getElementById('editTaskDate').value = task.plannedDate || '';
     document.getElementById('editTaskPriority').value = task.priority;
 
     // Calculate and display earnings
@@ -634,7 +827,7 @@
 
     // Show edit form
     document.getElementById('editTaskForm').classList.remove('hidden');
-    document.getElementById('editTaskTitle').focus();
+    document.getElementById('editTaskName').focus();
   }
 
   function hideEditForm() {
@@ -642,37 +835,37 @@
     editingTaskId = null;
 
     // Clear form
+    document.getElementById('editTaskName').value = '';
     document.getElementById('editTaskTitle').value = '';
     document.getElementById('editTaskLocation').value = '';
     document.getElementById('editTaskCustomerPrice').value = '';
     document.getElementById('editTaskSpareParts').value = '';
     document.getElementById('editTaskPhone').value = '';
+    document.getElementById('editTaskDate').value = '';
     document.getElementById('editTaskPriority').value = 'low';
     calculateEditEarnings();
   }
 
   async function saveEditedTask() {
-    if (!editingTaskId) {
-      return;
-    }
+    if (!editingTaskId) return;
 
+    const name = document.getElementById('editTaskName').value.trim();
     const title = document.getElementById('editTaskTitle').value.trim();
     const location = document.getElementById('editTaskLocation').value.trim();
     const customerPrice = parseFloat(document.getElementById('editTaskCustomerPrice').value) || 0;
     const spareParts = parseFloat(document.getElementById('editTaskSpareParts').value) || 0;
     const phone = document.getElementById('editTaskPhone').value.trim();
+    const plannedDate = document.getElementById('editTaskDate').value || null;
     const earnings = customerPrice - spareParts;
     const priority = document.getElementById('editTaskPriority').value;
 
-    if (!title || !location) {
-      alert('Bitte füllen Sie Titel und Adresse aus!');
+    if (!name || !title || !location) {
+      alert('Bitte füllen Sie Name, Titel und Adresse aus!');
       return;
     }
 
     const task = tasks.find(t => t.id === editingTaskId);
-    if (!task) {
-      return;
-    }
+    if (!task) return;
 
     // Check if location changed - if so, get new coordinates
     if (task.location !== location) {
@@ -703,14 +896,19 @@
       }
     }
 
+    // Automatically set status to "planned" if a date is provided
+    const finalPriority = plannedDate && priority !== 'high' ? 'medium' : priority;
+
     // Update task data
+    task.name = name;
     task.title = title;
     task.location = location;
     task.customerPrice = customerPrice;
     task.spareParts = spareParts;
     task.phone = phone;
+    task.plannedDate = plannedDate;
     task.earnings = earnings;
-    task.priority = priority;
+    task.priority = finalPriority;
 
     // Save to storage and update display
     saveTasksToStorage();
@@ -759,19 +957,19 @@
     const dayBtn = document.getElementById('dayViewBtn');
 
     [monthBtn, weekBtn, dayBtn].forEach(btn => {
-      btn.classList.remove('bg-blue-500');
-      btn.classList.add('bg-blue-700');
+      btn.classList.remove('bg-blue-500', 'text-white');
+      btn.classList.add('bg-blue-100', 'text-blue-600');
     });
 
     if (mode === 'month') {
-      monthBtn.classList.remove('bg-blue-700');
-      monthBtn.classList.add('bg-blue-500');
+      monthBtn.classList.remove('bg-blue-100', 'text-blue-600');
+      monthBtn.classList.add('bg-blue-500', 'text-white');
     } else if (mode === 'week') {
-      weekBtn.classList.remove('bg-blue-700');
-      weekBtn.classList.add('bg-blue-500');
+      weekBtn.classList.remove('bg-blue-100', 'text-blue-600');
+      weekBtn.classList.add('bg-blue-500', 'text-white');
     } else if (mode === 'day') {
-      dayBtn.classList.remove('bg-blue-700');
-      dayBtn.classList.add('bg-blue-500');
+      dayBtn.classList.remove('bg-blue-100', 'text-blue-600');
+      dayBtn.classList.add('bg-blue-500', 'text-white');
     }
 
     updateCalendarView();
@@ -780,8 +978,7 @@
   function updateCalendarView() {
     const monthNames = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni',
       'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
-    const dayNames = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag',
-      'Samstag'];
+    const dayNames = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
 
     // Hide all views first
     document.getElementById('monthView').classList.add('hidden');
@@ -822,16 +1019,14 @@
       const isToday = cellDate.toDateString() === new Date().toDateString();
       const dateStr = cellDate.toISOString().split('T')[0];
 
-      const dayTasks = tasks.filter(task => task.plannedDate === dateStr);
+      const dayTasks = tasks.filter(task => task.plannedDate === dateStr && !task.completed);
 
       const cell = document.createElement('div');
-      cell.className = `min-h-[80px] border rounded p-1 ${isCurrentMonth ? 'bg-white'
-        : 'bg-gray-100'} ${isToday ? 'ring-2 ring-blue-500' : ''}`;
+      cell.className = `min-h-[80px] border rounded p-1 ${isCurrentMonth ? 'bg-white' : 'bg-gray-100'} ${isToday ? 'ring-2 ring-blue-500' : ''}`;
       cell.setAttribute('data-date', dateStr);
 
       cell.innerHTML = `
-                <div class="text-xs font-bold mb-1 ${isCurrentMonth ? 'text-gray-900'
-        : 'text-gray-400'}">${cellDate.getDate()}</div>
+                <div class="text-xs font-bold mb-1 ${isCurrentMonth ? 'text-gray-900' : 'text-gray-400'}">${cellDate.getDate()}</div>
                 <div class="space-y-1" id="tasks-${dateStr}">
                     ${dayTasks.map(task => createTaskElement(task, true)).join('')}
                 </div>
@@ -841,6 +1036,11 @@
       cell.addEventListener('dragover', handleDragOver);
       cell.addEventListener('drop', handleDrop);
       cell.addEventListener('dragleave', (e) => e.currentTarget.classList.remove('bg-blue-50'));
+
+      // Add touch events for mobile
+      cell.addEventListener('touchstart', (e) => e.preventDefault());
+      cell.addEventListener('touchmove', (e) => e.preventDefault());
+      cell.addEventListener('touchend', (e) => e.preventDefault());
 
       calendarGrid.appendChild(cell);
     }
@@ -875,11 +1075,10 @@
       const isToday = cellDate.toDateString() === new Date().toDateString();
       const dateStr = cellDate.toISOString().split('T')[0];
 
-      const dayTasks = tasks.filter(task => task.plannedDate === dateStr);
+      const dayTasks = tasks.filter(task => task.plannedDate === dateStr && !task.completed);
 
       const cell = document.createElement('div');
-      cell.className = `min-h-[120px] border rounded p-2 bg-white ${isToday ? 'ring-2 ring-blue-500'
-        : ''}`;
+      cell.className = `min-h-[120px] border rounded p-2 bg-white ${isToday ? 'ring-2 ring-blue-500' : ''}`;
       cell.setAttribute('data-date', dateStr);
 
       cell.innerHTML = `
@@ -894,6 +1093,11 @@
       cell.addEventListener('drop', handleDrop);
       cell.addEventListener('dragleave', (e) => e.currentTarget.classList.remove('bg-blue-50'));
 
+      // Add touch events for mobile
+      cell.addEventListener('touchstart', (e) => e.preventDefault());
+      cell.addEventListener('touchmove', (e) => e.preventDefault());
+      cell.addEventListener('touchend', (e) => e.preventDefault());
+
       weekGrid.appendChild(cell);
     }
   }
@@ -904,7 +1108,7 @@
       `${dayName}, ${currentDate.getDate()} ${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
 
     const dateStr = currentDate.toISOString().split('T')[0];
-    const dayTasks = tasks.filter(task => task.plannedDate === dateStr);
+    const dayTasks = tasks.filter(task => task.plannedDate === dateStr && !task.completed);
 
     const dayContainer = document.getElementById('dayContainer');
     dayContainer.setAttribute('data-date', dateStr);
@@ -935,8 +1139,7 @@
     // Add drop functionality
     dayContainer.addEventListener('dragover', handleDragOver);
     dayContainer.addEventListener('drop', handleDrop);
-    dayContainer.addEventListener('dragleave',
-      (e) => e.currentTarget.classList.remove('bg-blue-50'));
+    dayContainer.addEventListener('dragleave', (e) => e.currentTarget.classList.remove('bg-blue-50'));
   }
 
   function createDetailedTaskElement(task) {
@@ -953,25 +1156,19 @@
     };
 
     return `
-            <div class="bg-white border-l-4 ${priorityColors[task.priority]} rounded-xl p-5 shadow-md hover:shadow-lg transition-shadow duration-200 ${task.completed
-      ? 'opacity-75' : ''}">
+            <div class="bg-white border-l-4 ${priorityColors[task.priority]} rounded-xl p-5 shadow-md hover:shadow-lg transition-shadow duration-200 ${task.completed ? 'opacity-75' : ''}">
                 <!-- Header -->
                 <div class="flex items-start justify-between mb-4">
                     <div class="flex items-center space-x-3 flex-1">
                         <button onclick="toggleTask(${task.id}); updateCalendarView();"
-                                class="w-6 h-6 rounded-full border-2 ${task.completed
-      ? 'bg-green-500 border-green-500 text-white' : 'border-gray-300 hover:border-blue-400'} flex items-center justify-center transition-colors duration-200 flex-shrink-0">
+                                class="w-6 h-6 rounded-full border-2 ${task.completed ? 'bg-green-500 border-green-500 text-white' : 'border-gray-300 hover:border-blue-400'} flex items-center justify-center transition-colors duration-200 flex-shrink-0">
                             ${task.completed ? '✓' : ''}
                         </button>
-                        <h3 class="text-lg font-semibold ${task.completed
-      ? 'line-through text-gray-500' : 'text-gray-900'} leading-tight">${task.title}</h3>
+                        <h3 class="text-lg font-semibold ${task.completed ? 'line-through text-gray-500' : 'text-gray-900'} leading-tight">${task.title}</h3>
                     </div>
                     <div class="flex items-center space-x-2 ml-4">
-                        <span class="px-2 py-1 text-xs font-medium rounded-full ${task.priority
-    === 'high' ? 'bg-red-100 text-red-700' : task.priority === 'medium'
-      ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}">
-                            ${priorityIcons[task.priority]} ${task.priority === 'low' ? 'Offen'
-      : task.priority === 'medium' ? 'Geplant' : 'Dringend'}
+                        <span class="px-2 py-1 text-xs font-medium rounded-full ${task.priority === 'high' ? 'bg-red-100 text-red-700' : task.priority === 'medium' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}">
+                            ${priorityIcons[task.priority]} ${task.priority === 'low' ? 'Offen' : task.priority === 'medium' ? 'Geplant' : 'Dringend'}
                         </span>
                         <button onclick="editTask(${task.id})"
                                 class="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors duration-200" title="Bearbeiten">
@@ -1016,8 +1213,7 @@
                         ${task.earnings !== 0 ? `
                         <div class="bg-white rounded-lg p-2">
                             <div class="text-xs text-gray-500 mb-1">Einnahmen</div>
-                            <div class="font-bold text-${task.earnings >= 0 ? 'green'
-      : 'red'}-600">📈 ${task.earnings.toFixed(2)} €</div>
+                            <div class="font-bold text-${task.earnings >= 0 ? 'green' : 'red'}-600">📈 ${task.earnings.toFixed(2)} €</div>
                         </div>
                         ` : '<div></div>'}
                     </div>
@@ -1042,8 +1238,58 @@
         `;
   }
 
+  function setTaskFilter(filter) {
+    currentFilter = filter;
+
+    // Update button styles
+    const allBtn = document.getElementById('allTasksBtn');
+    const openBtn = document.getElementById('openTasksBtn');
+    const plannedBtn = document.getElementById('plannedTasksBtn');
+    const urgentBtn = document.getElementById('urgentTasksBtn');
+    const completedBtn = document.getElementById('completedTasksBtn');
+
+    [allBtn, openBtn, plannedBtn, urgentBtn, completedBtn].forEach(btn => {
+      btn.classList.remove('bg-blue-500', 'text-white');
+      btn.classList.add('bg-blue-100', 'text-blue-600');
+    });
+
+    if (filter === 'all') {
+      allBtn.classList.remove('bg-blue-100', 'text-blue-600');
+      allBtn.classList.add('bg-blue-500', 'text-white');
+    } else if (filter === 'open') {
+      openBtn.classList.remove('bg-blue-100', 'text-blue-600');
+      openBtn.classList.add('bg-blue-500', 'text-white');
+    } else if (filter === 'planned') {
+      plannedBtn.classList.remove('bg-blue-100', 'text-blue-600');
+      plannedBtn.classList.add('bg-blue-500', 'text-white');
+    } else if (filter === 'urgent') {
+      urgentBtn.classList.remove('bg-blue-100', 'text-blue-600');
+      urgentBtn.classList.add('bg-blue-500', 'text-white');
+    } else if (filter === 'completed') {
+      completedBtn.classList.remove('bg-blue-100', 'text-blue-600');
+      completedBtn.classList.add('bg-blue-500', 'text-white');
+    }
+
+    updateListView();
+  }
+
+  function getFilteredTasks() {
+    if (currentFilter === 'all') {
+      return tasks.filter(task => !task.completed);
+    } else if (currentFilter === 'open') {
+      return tasks.filter(task => !task.completed && task.priority === 'low');
+    } else if (currentFilter === 'planned') {
+      return tasks.filter(task => !task.completed && task.priority === 'medium');
+    } else if (currentFilter === 'urgent') {
+      return tasks.filter(task => !task.completed && task.priority === 'high');
+    } else if (currentFilter === 'completed') {
+      return tasks.filter(task => task.completed);
+    }
+    return tasks;
+  }
+
   function updateUnplannedTasks() {
-    const unplannedTasks = tasks.filter(task => !task.plannedDate);
+    const unplannedTasks = tasks.filter(task => !task.plannedDate && !task.completed);
     const container = document.getElementById('unplannedTasks');
     const counter = document.getElementById('unplannedCount');
 
@@ -1074,27 +1320,28 @@
     };
 
     return `
-            <div class="task-item ${priorityColors[task.priority]} border-2 rounded-lg p-3 cursor-move text-sm transition-colors duration-200 ${task.completed
-      ? 'opacity-60' : ''}"
+            <div class="task-item ${priorityColors[task.priority]} border-2 rounded-lg p-3 cursor-move text-sm transition-colors duration-200 ${task.completed ? 'opacity-60' : ''}"
                  draggable="true"
                  data-task-id="${task.id}"
-                 ondragstart="handleDragStart(event)">
+                 ondragstart="handleDragStart(event)"
+                 ontouchstart="handleTouchStart(event)"
+                 ontouchmove="handleTouchMove(event)"
+                 ontouchend="handleTouchEnd(event)"
+                 onclick="openTaskModal(${task.id})">
                 <div class="flex items-start space-x-3">
-                    <button onclick="toggleTask(${task.id}); updateCalendarView();"
-                            class="w-5 h-5 rounded-full border-2 ${task.completed
-      ? 'bg-green-500 border-green-500 text-white' : 'border-gray-300 hover:border-blue-400'} flex items-center justify-center text-xs mt-0.5 transition-colors duration-200 flex-shrink-0">
+                    <button onclick="event.stopPropagation(); toggleTask(${task.id}); updateCalendarView();"
+                            class="w-5 h-5 rounded-full border-2 ${task.completed ? 'bg-green-500 border-green-500 text-white' : 'border-gray-300 hover:border-blue-400'} flex items-center justify-center text-xs mt-0.5 transition-colors duration-200 flex-shrink-0">
                         ${task.completed ? '✓' : ''}
                     </button>
                     <div class="flex-1 min-w-0">
-                        <div class="font-semibold truncate ${task.completed
-      ? 'line-through text-gray-500' : 'text-gray-900'} mb-1">${task.title}</div>
+                        <div class="font-semibold truncate ${task.completed ? 'line-through text-gray-500' : 'text-gray-900'} mb-1">${task.name || task.title}</div>
                         <div class="flex items-center text-gray-600 mb-2">
                             <span class="text-blue-500 mr-1">📍</span>
                             <span class="truncate text-xs">${task.location}</span>
                         </div>
 
                         ${task.phone ? `
-                        <button onclick="showContactOptions('${task.phone}')"
+                        <button onclick="event.stopPropagation(); copyToClipboard('${task.phone}')"
                                 class="flex items-center space-x-1 px-2 py-1 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors duration-200 text-xs mb-2">
                             <span>📞</span>
                             <span class="truncate">${task.phone}</span>
@@ -1104,16 +1351,12 @@
                         <div class="flex items-center justify-between text-xs">
                             ${task.customerPrice > 0 || task.earnings !== 0 ? `
                             <div class="flex items-center space-x-2">
-                                ${task.customerPrice > 0
-      ? `<span class="text-green-600 font-medium">💰 ${task.customerPrice.toFixed(2)}€</span>` : ''}
-                                ${task.earnings !== 0 ? `<span class="text-${task.earnings >= 0
-      ? 'green' : 'red'}-600 font-medium">📈 ${task.earnings.toFixed(2)}€</span>` : ''}
+                                ${task.customerPrice > 0 ? `<span class="text-green-600 font-medium">💰 ${task.customerPrice.toFixed(2)}€</span>` : ''}
+                                ${task.earnings !== 0 ? `<span class="text-${task.earnings >= 0 ? 'green' : 'red'}-600 font-medium">📈 ${task.earnings.toFixed(2)}€</span>` : ''}
                             </div>
                             ` : '<div></div>'}
 
-                            ${task.completed
-      ? '<span class="text-green-600 font-medium">✅ Erledigt</span>'
-      : '<span class="text-gray-400">🔄 Ziehen zum Planen</span>'}
+                            ${task.completed ? '<span class="text-green-600 font-medium">✅ Erledigt</span>' : '<span class="text-gray-400">🔄 Ziehen zum Planen</span>'}
                         </div>
                     </div>
                 </div>
@@ -1129,32 +1372,19 @@
     };
 
     return `
-            <div class="task-item ${priorityColors[task.priority]} border-2 rounded-lg p-2 cursor-move text-xs transition-colors duration-200 ${task.completed
-      ? 'opacity-60' : ''}"
+            <div class="task-item ${priorityColors[task.priority]} border-2 rounded-lg p-2 cursor-move text-xs transition-colors duration-200 ${task.completed ? 'opacity-60' : ''}"
                  draggable="true"
                  data-task-id="${task.id}"
-                 ondragstart="handleDragStart(event)">
-                <div class="font-semibold truncate ${task.completed ? 'line-through text-gray-500'
-      : 'text-gray-900'} mb-1">${task.title}</div>
-                <div class="flex items-center text-gray-600 mb-1">
-                    <span class="text-blue-500 mr-1">📍</span>
-                    <span class="truncate">${task.location}</span>
-                </div>
-
-                <div class="flex items-center justify-between">
-                    ${task.phone
-      ? `<button onclick="showContactOptions('${task.phone}')" class="text-blue-600 hover:text-blue-800 font-medium">📞</button>`
-      : '<div></div>'}
-                    ${task.completed ? '<span class="text-green-600 font-medium">✅</span>' : ''}
-                </div>
-
-                ${task.customerPrice > 0
-      ? `<div class="text-green-600 font-medium mt-1">💰 ${task.customerPrice.toFixed(2)}€</div>`
-      : ''}
+                 ondragstart="handleDragStart(event)"
+                 ontouchstart="handleTouchStart(event)"
+                 ontouchmove="handleTouchMove(event)"
+                 ontouchend="handleTouchEnd(event)"
+                 onclick="openTaskModal(${task.id})">
+                <div class="font-semibold truncate ${task.completed ? 'line-through text-gray-500' : 'text-gray-900'} mb-1">${task.name || task.title}</div>
 
                 ${isPlanned ? `
-                <button onclick="unplanTask(${task.id})"
-                        class="w-full text-center text-red-500 hover:text-red-700 font-medium mt-2 py-1 hover:bg-red-50 rounded transition-colors duration-200">
+                <button onclick="event.stopPropagation(); unplanTask(${task.id})"
+                        class="w-full text-center text-red-500 hover:text-red-700 font-medium mt-1 py-1 hover:bg-red-50 rounded transition-colors duration-200">
                     ❌ Entfernen
                 </button>
                 ` : ''}
@@ -1183,6 +1413,10 @@
 
       if (task) {
         task.plannedDate = targetDate;
+        // Automatically set status to "planned" when task gets a date
+        if (task.priority !== 'high') { // Don't change urgent tasks
+          task.priority = 'medium';
+        }
         saveTasksToStorage();
         updateCalendarView();
       }
@@ -1191,10 +1425,100 @@
     }
   }
 
+  // Touch event handlers for mobile
+  let touchStartX, touchStartY, touchElement, touchClone;
+
+  function handleTouchStart(event) {
+    const touch = event.touches[0];
+    touchStartX = touch.clientX;
+    touchStartY = touch.clientY;
+    touchElement = event.currentTarget;
+    draggedTask = parseInt(touchElement.getAttribute('data-task-id'));
+
+    // Create visual feedback
+    touchElement.style.opacity = '0.7';
+    touchElement.style.transform = 'scale(1.05)';
+
+    event.preventDefault();
+  }
+
+  function handleTouchMove(event) {
+    if (!touchElement) return;
+
+    const touch = event.touches[0];
+    const deltaX = touch.clientX - touchStartX;
+    const deltaY = touch.clientY - touchStartY;
+
+    // Move the element
+    touchElement.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(1.05)`;
+    touchElement.style.zIndex = '1000';
+
+    // Find element under touch
+    const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+    const dropZone = elementBelow?.closest('[data-date]');
+
+    // Visual feedback for drop zones
+    document.querySelectorAll('[data-date]').forEach(zone => {
+      zone.classList.remove('bg-blue-50');
+    });
+
+    if (dropZone && dropZone !== touchElement.closest('[data-date]')) {
+      dropZone.classList.add('bg-blue-50');
+    }
+
+    event.preventDefault();
+  }
+
+  function handleTouchEnd(event) {
+    if (!touchElement) return;
+
+    const touch = event.changedTouches[0];
+    const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+    const dropZone = elementBelow?.closest('[data-date]');
+
+    // Reset visual state
+    touchElement.style.opacity = '';
+    touchElement.style.transform = '';
+    touchElement.style.zIndex = '';
+
+    // Remove all drop zone highlights
+    document.querySelectorAll('[data-date]').forEach(zone => {
+      zone.classList.remove('bg-blue-50');
+    });
+
+    // Handle drop
+    if (dropZone && draggedTask) {
+      const targetDate = dropZone.getAttribute('data-date');
+      const task = tasks.find(t => t.id === draggedTask);
+
+      if (task && targetDate !== task.plannedDate) {
+        task.plannedDate = targetDate;
+        // Automatically set status to "planned" when task gets a date
+        if (task.priority !== 'high') { // Don't change urgent tasks
+          task.priority = 'medium';
+        }
+        saveTasksToStorage();
+        updateCalendarView();
+      }
+    }
+
+    // Reset touch state
+    touchElement = null;
+    draggedTask = null;
+    touchStartX = null;
+    touchStartY = null;
+
+    event.preventDefault();
+  }
+
   function unplanTask(taskId) {
     const task = tasks.find(t => t.id === taskId);
     if (task) {
       task.plannedDate = null;
+      // Automatically set status back to "open" when removing date (unless urgent)
+      if (task.priority === 'medium') {
+        task.priority = 'low';
+      }
       saveTasksToStorage();
       updateCalendarView();
     }
@@ -1204,15 +1528,54 @@
     const taskList = document.getElementById('taskList');
     const emptyState = document.getElementById('emptyState');
 
-    if (tasks.length === 0) {
+    const filteredTasks = getFilteredTasks();
+
+    if (filteredTasks.length === 0) {
       taskList.innerHTML = '';
+
+      // Show appropriate empty state message
+      let emptyMessage = '';
+      let emptyIcon = '';
+
+      if (currentFilter === 'all') {
+        emptyMessage = 'Keine offenen Aufgaben vorhanden';
+        emptyIcon = '📝';
+      } else if (currentFilter === 'open') {
+        emptyMessage = 'Keine offenen Aufgaben vorhanden';
+        emptyIcon = '🔵';
+      } else if (currentFilter === 'planned') {
+        emptyMessage = 'Keine geplanten Aufgaben vorhanden';
+        emptyIcon = '🟢';
+      } else if (currentFilter === 'urgent') {
+        emptyMessage = 'Keine dringenden Aufgaben vorhanden';
+        emptyIcon = '🔴';
+      } else if (currentFilter === 'completed') {
+        emptyMessage = 'Keine erledigten Aufgaben vorhanden';
+        emptyIcon = '✅';
+      }
+
+      emptyState.innerHTML = `
+                <div class="text-center py-16 text-gray-500">
+                    <div class="bg-gray-50 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6">
+                        <div class="text-4xl">${emptyIcon}</div>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-700 mb-2">${emptyMessage}</h3>
+                    <p class="text-sm text-gray-500 mb-6">Fügen Sie Ihre erste Aufgabe hinzu und beginnen Sie mit der Planung!</p>
+                    ${currentFilter !== 'completed' ? `
+                    <button onclick="document.getElementById('toggleFormBtn').click()"
+                            class="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 font-medium">
+                        ➕ Erste Aufgabe erstellen
+                    </button>
+                    ` : ''}
+                </div>
+            `;
       emptyState.style.display = 'block';
       return;
     }
 
     emptyState.style.display = 'none';
 
-    taskList.innerHTML = tasks.map(task => {
+    taskList.innerHTML = filteredTasks.map(task => {
       const priorityColors = {
         low: 'border-l-blue-500',
         medium: 'border-l-green-500',
@@ -1226,121 +1589,142 @@
       };
 
       return `
-                <div class="bg-white border-l-4 ${priorityColors[task.priority]} rounded-xl p-5 shadow-lg hover:shadow-xl transition-shadow duration-200 ${task.completed
-        ? 'opacity-75' : ''}">
-                    <!-- Header mit Titel und Status -->
-                    <div class="flex items-start justify-between mb-4">
-                        <div class="flex items-center space-x-3 flex-1">
-                            <button onclick="toggleTask(${task.id})"
-                                    class="w-6 h-6 rounded-full border-2 ${task.completed
-        ? 'bg-green-500 border-green-500 text-white' : 'border-gray-300 hover:border-blue-400'} flex items-center justify-center transition-colors duration-200 flex-shrink-0">
-                                ${task.completed ? '✓' : ''}
-                            </button>
-                            <h3 class="text-lg font-semibold ${task.completed
-        ? 'line-through text-gray-500' : 'text-gray-900'} leading-tight">${task.title}</h3>
+                <div class="bg-white border-l-4 ${priorityColors[task.priority]} rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-200 ${task.completed ? 'opacity-75' : ''}">
+                    <!-- Compact Header -->
+                    <div class="p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center space-x-3 flex-1">
+                                <button onclick="toggleTask(${task.id})"
+                                        class="w-6 h-6 rounded-full border-2 ${task.completed ? 'bg-green-500 border-green-500 text-white' : 'border-gray-300 hover:border-blue-400'} flex items-center justify-center transition-colors duration-200 flex-shrink-0">
+                                    ${task.completed ? '✓' : ''}
+                                </button>
+                                <div class="flex-1">
+                                    <div class="flex items-center space-x-2 mb-1">
+                                        <h3 class="text-lg font-semibold ${task.completed ? 'line-through text-gray-500' : 'text-gray-900'} leading-tight">${task.name || task.title}</h3>
+                                        <span class="px-2 py-1 text-xs font-medium rounded-full ${task.priority === 'high' ? 'bg-red-100 text-red-700' : task.priority === 'medium' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}">
+                                            ${priorityIcons[task.priority]} ${task.priority === 'low' ? 'Offen' : task.priority === 'medium' ? 'Geplant' : 'Dringend'}
+                                        </span>
+                                    </div>
+                                    ${task.name ? `<p class="text-sm text-gray-600">${task.title}</p>` : ''}
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-1">
+                                <button onclick="editTask(${task.id})"
+                                        class="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors duration-200" title="Bearbeiten">
+                                    ✏️
+                                </button>
+                                <button onclick="toggleTaskDetails(${task.id})"
+                                        class="p-2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                                        id="expand-btn-${task.id}">
+                                    ▼
+                                </button>
+                            </div>
                         </div>
-                        <div class="flex items-center space-x-2 ml-4">
-                            <span class="px-2 py-1 text-xs font-medium rounded-full ${task.priority
-      === 'high' ? 'bg-red-100 text-red-700' : task.priority === 'medium'
-        ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}">
-                                ${priorityIcons[task.priority]} ${task.priority === 'low' ? 'Offen'
-        : task.priority === 'medium' ? 'Geplant' : 'Dringend'}
+
+                        <!-- Basic Info -->
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2 text-gray-700 flex-1">
+                                <span class="text-blue-500">📍</span>
+                                <span class="font-medium truncate">${task.location.split(',').slice(-2)[0]?.trim() || task.location.split(',')[0]}</span>
+                            </div>
+
+                            <div class="flex items-center space-x-2 ml-4">
+                                ${task.phone ? `
+                                <button onclick="copyToClipboard('${task.phone}')"
+                                        class="flex items-center space-x-1 px-2 py-1 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors duration-200 text-xs">
+                                    <span>📞</span>
+                                    <span>${task.phone}</span>
+                                </button>
+                                ` : ''}
+
+                                <button onclick="openNavigation([${task.coordinates[0]}, ${task.coordinates[1]}], '${task.location}')"
+                                        class="flex items-center space-x-1 px-3 py-1 bg-green-500 text-white rounded-full hover:bg-green-600 transition-colors duration-200 text-xs">
+                                    <span>🧭</span>
+                                    <span>Navigation</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Expandable Details -->
+                    <div id="details-${task.id}" class="hidden border-t border-gray-100 p-4 bg-gray-50">
+                        <!-- Priority Badge -->
+                        <div class="mb-4">
+                            <span class="px-3 py-1 text-sm font-medium rounded-full ${task.priority === 'high' ? 'bg-red-100 text-red-700' : task.priority === 'medium' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}">
+                                ${priorityIcons[task.priority]} ${task.priority === 'low' ? 'Offen' : task.priority === 'medium' ? 'Geplant' : 'Dringend'}
                             </span>
                         </div>
-                    </div>
 
-                    <!-- Adresse und Kontakt -->
-                    <div class="bg-gray-50 rounded-lg p-3 mb-4">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center space-x-2 text-gray-700">
-                                <span class="text-blue-500">📍</span>
-                                <span class="font-medium">${task.location}</span>
+                        <!-- Finanzielle Informationen -->
+                        ${task.customerPrice > 0 || task.spareParts > 0 || task.earnings !== 0 ? `
+                        <div class="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-3 mb-4">
+                            <div class="grid grid-cols-3 gap-3 text-center">
+                                ${task.customerPrice > 0 ? `
+                                <div class="bg-white rounded-lg p-2">
+                                    <div class="text-xs text-gray-500 mb-1">Kundenpreis</div>
+                                    <div class="font-bold text-green-600">💰 ${task.customerPrice.toFixed(2)} €</div>
+                                </div>
+                                ` : '<div></div>'}
+                                ${task.spareParts > 0 ? `
+                                <div class="bg-white rounded-lg p-2">
+                                    <div class="text-xs text-gray-500 mb-1">Ersatzteile</div>
+                                    <div class="font-bold text-orange-600">🔧 ${task.spareParts.toFixed(2)} €</div>
+                                </div>
+                                ` : '<div></div>'}
+                                ${task.earnings !== 0 ? `
+                                <div class="bg-white rounded-lg p-2">
+                                    <div class="text-xs text-gray-500 mb-1">Einnahmen</div>
+                                    <div class="font-bold text-${task.earnings >= 0 ? 'green' : 'red'}-600">📈 ${task.earnings.toFixed(2)} €</div>
+                                </div>
+                                ` : '<div></div>'}
                             </div>
-                            ${task.phone ? `
-                            <button onclick="showContactOptions('${task.phone}')"
-                                    class="flex items-center space-x-1 px-3 py-1 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors duration-200 text-sm">
-                                <span>📞</span>
-                                <span>${task.phone}</span>
-                            </button>
-                            ` : ''}
                         </div>
-                    </div>
+                        ` : ''}
 
-                    <!-- Finanzielle Informationen -->
-                    ${task.customerPrice > 0 || task.spareParts > 0 || task.earnings !== 0 ? `
-                    <div class="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-3 mb-4">
-                        <div class="grid grid-cols-3 gap-3 text-center">
-                            ${task.customerPrice > 0 ? `
-                            <div class="bg-white rounded-lg p-2">
-                                <div class="text-xs text-gray-500 mb-1">Kundenpreis</div>
-                                <div class="font-bold text-green-600">💰 ${task.customerPrice.toFixed(
-        2)} €</div>
-                            </div>
-                            ` : '<div></div>'}
-                            ${task.spareParts > 0 ? `
-                            <div class="bg-white rounded-lg p-2">
-                                <div class="text-xs text-gray-500 mb-1">Ersatzteile</div>
-                                <div class="font-bold text-orange-600">🔧 ${task.spareParts.toFixed(
-        2)} €</div>
-                            </div>
-                            ` : '<div></div>'}
-                            ${task.earnings !== 0 ? `
-                            <div class="bg-white rounded-lg p-2">
-                                <div class="text-xs text-gray-500 mb-1">Einnahmen</div>
-                                <div class="font-bold text-${task.earnings >= 0 ? 'green'
-        : 'red'}-600">📈 ${task.earnings.toFixed(2)} €</div>
-                            </div>
-                            ` : '<div></div>'}
+                        <!-- Zeitstempel -->
+                        <div class="flex items-center justify-between text-xs text-gray-400 mb-4 bg-white rounded-lg p-2">
+                            <span>📅 Erstellt: ${task.createdAt}</span>
+                            ${task.plannedDate ? `<span class="text-blue-500">📋 Geplant: ${new Date(task.plannedDate).toLocaleDateString('de-DE')}</span>` : ''}
+                            ${task.completedAt ? `<span class="text-green-500">✅ Erledigt: ${task.completedAt}</span>` : ''}
                         </div>
-                    </div>
-                    ` : ''}
 
-                    <!-- Zeitstempel -->
-                    <div class="flex items-center justify-between text-xs text-gray-400 mb-4 bg-gray-50 rounded-lg p-2">
-                        <span>📅 Erstellt: ${task.createdAt}</span>
-                        ${task.plannedDate ? `<span class="text-blue-500">📋 Geplant: ${new Date(
-        task.plannedDate).toLocaleDateString('de-DE')}</span>` : ''}
-                        ${task.completedAt
-        ? `<span class="text-green-500">✅ Erledigt: ${task.completedAt}</span>` : ''}
-                    </div>
-
-                    <!-- Aktionen -->
-                    <div class="flex items-center justify-between">
-                        <button onclick="openNavigation([${task.coordinates[0]}, ${task.coordinates[1]}], '${task.location}')"
-                                class="flex items-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 font-medium">
-                            <span>🧭</span>
-                            <span>Navigation</span>
-                        </button>
-
-                        <div class="flex items-center space-x-2">
-                            <button onclick="editTask(${task.id})"
-                                    class="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors duration-200" title="Bearbeiten">
-                                ✏️
-                            </button>
+                        <!-- Aktionen -->
+                        <div class="flex items-center justify-end">
                             <button onclick="deleteTask(${task.id})"
-                                    class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors duration-200" title="Löschen">
+                                    class="p-1.5 bg-red-100 text-red-600 rounded-full hover:bg-red-200 transition-colors duration-200 text-sm" title="Löschen">
                                 🗑️
                             </button>
                         </div>
-                    </div>
 
-                    ${task.fullAddress ? `
-                    <div class="mt-3 pt-3 border-t border-gray-100">
-                        <div class="text-xs text-gray-500 flex items-start space-x-2">
-                            <span class="text-gray-400">🏠</span>
-                            <span class="leading-relaxed">${task.fullAddress}</span>
+                        ${task.fullAddress ? `
+                        <div class="mt-3 pt-3 border-t border-gray-200">
+                            <div class="text-xs text-gray-500 flex items-start space-x-2">
+                                <span class="text-gray-400">🏠</span>
+                                <span class="leading-relaxed">${task.fullAddress}</span>
+                            </div>
                         </div>
+                        ` : ''}
                     </div>
-                    ` : ''}
                 </div>
             `;
     }).join('');
   }
 
-  function updateMapView() {
-    if (!map) {
-      return;
+  function toggleTaskDetails(taskId) {
+    const details = document.getElementById(`details-${taskId}`);
+    const button = document.getElementById(`expand-btn-${taskId}`);
+
+    if (details.classList.contains('hidden')) {
+      details.classList.remove('hidden');
+      button.textContent = '▲';
+    } else {
+      details.classList.add('hidden');
+      button.textContent = '▼';
     }
+  }
+
+  function updateMapView() {
+    if (!map) return;
 
     // Clear existing markers
     map.eachLayer(layer => {
@@ -1369,22 +1753,13 @@
                     <div class="p-2">
                         <h4 class="font-bold text-sm mb-1">${task.title}</h4>
                         <p class="text-xs text-gray-600 mb-2">📍 ${task.location}</p>
-                        ${task.phone
-          ? `<button onclick="showContactOptions('${task.phone}')" class="text-xs text-blue-600 hover:text-blue-800 mb-2 block">📞 ${task.phone}</button>`
-          : ''}
-                        ${task.customerPrice > 0
-          ? `<p class="text-xs text-gray-600 mb-1">💰 Kundenpreis: ${task.customerPrice.toFixed(
-            2)} €</p>` : ''}
-                        ${task.spareParts > 0
-          ? `<p class="text-xs text-gray-600 mb-1">🔧 Ersatzteile: ${task.spareParts.toFixed(
-            2)} €</p>` : ''}
-                        ${task.earnings !== 0 ? `<p class="text-xs text-${task.earnings >= 0
-          ? 'green' : 'red'}-600 mb-2">📈 Einnahmen: ${task.earnings.toFixed(2)} €</p>` : ''}
-                        ${task.fullAddress
-          ? `<p class="text-xs text-gray-500 mb-2">${task.fullAddress}</p>` : ''}
+                        ${task.phone ? `<button onclick="showContactOptions('${task.phone}')" class="text-xs text-blue-600 hover:text-blue-800 mb-2 block">📞 ${task.phone}</button>` : ''}
+                        ${task.customerPrice > 0 ? `<p class="text-xs text-gray-600 mb-1">💰 Kundenpreis: ${task.customerPrice.toFixed(2)} €</p>` : ''}
+                        ${task.spareParts > 0 ? `<p class="text-xs text-gray-600 mb-1">🔧 Ersatzteile: ${task.spareParts.toFixed(2)} €</p>` : ''}
+                        ${task.earnings !== 0 ? `<p class="text-xs text-${task.earnings >= 0 ? 'green' : 'red'}-600 mb-2">📈 Einnahmen: ${task.earnings.toFixed(2)} €</p>` : ''}
+                        ${task.fullAddress ? `<p class="text-xs text-gray-500 mb-2">${task.fullAddress}</p>` : ''}
                         <div class="flex items-center justify-between mb-2">
-                            <span class="text-xs ${task.completed ? 'text-green-600'
-          : 'text-gray-500'}">
+                            <span class="text-xs ${task.completed ? 'text-green-600' : 'text-gray-500'}">
                                 ${task.completed ? '✅ Erledigt' : '⏳ Offen'}
                                 ${task.completedAt ? ` (${task.completedAt})` : ''}
                             </span>
@@ -1445,8 +1820,7 @@
                     <div class="flex justify-between items-center p-2 bg-gray-50 rounded">
                         <span class="font-medium">${month}</span>
                         <div class="text-right">
-                            <div class="font-bold ${data.earnings >= 0 ? 'text-green-600'
-        : 'text-red-600'}">${data.earnings.toFixed(2)} €</div>
+                            <div class="font-bold ${data.earnings >= 0 ? 'text-green-600' : 'text-red-600'}">${data.earnings.toFixed(2)} €</div>
                             <div class="text-xs text-gray-500">${data.count} Aufgaben</div>
                         </div>
                     </div>
@@ -1478,77 +1852,249 @@
 
     // Reset button styles
     [listBtn, mapBtn, calendarBtn, statsBtn].forEach(btn => {
-      btn.classList.remove('bg-blue-500');
-      btn.classList.add('bg-blue-700');
+      btn.classList.remove('bg-blue-500', 'text-white');
+      btn.classList.add('bg-blue-100', 'text-blue-600');
     });
 
     if (view === 'list') {
       listView.classList.remove('hidden');
-      listBtn.classList.remove('bg-blue-700');
-      listBtn.classList.add('bg-blue-500');
+      listBtn.classList.remove('bg-blue-100', 'text-blue-600');
+      listBtn.classList.add('bg-blue-500', 'text-white');
       updateListView();
     } else if (view === 'map') {
       mapView.classList.remove('hidden');
-      mapBtn.classList.remove('bg-blue-700');
-      mapBtn.classList.add('bg-blue-500');
+      mapBtn.classList.remove('bg-blue-100', 'text-blue-600');
+      mapBtn.classList.add('bg-blue-500', 'text-white');
       setTimeout(() => {
         map.invalidateSize();
         updateMapView();
       }, 100);
     } else if (view === 'calendar') {
       calendarView.classList.remove('hidden');
-      calendarBtn.classList.remove('bg-blue-700');
-      calendarBtn.classList.add('bg-blue-500');
+      calendarBtn.classList.remove('bg-blue-100', 'text-blue-600');
+      calendarBtn.classList.add('bg-blue-500', 'text-white');
       updateCalendarView();
     } else if (view === 'stats') {
       statsView.classList.remove('hidden');
-      statsBtn.classList.remove('bg-blue-700');
-      statsBtn.classList.add('bg-blue-500');
+      statsBtn.classList.remove('bg-blue-100', 'text-blue-600');
+      statsBtn.classList.add('bg-blue-500', 'text-white');
       updateStatsView();
     }
   }
 
   function updateTaskCount() {
-    const count = tasks.length;
+    const openTasks = tasks.filter(t => !t.completed).length;
     const completed = tasks.filter(t => t.completed).length;
-    document.getElementById('taskCount').textContent = `${count} Aufgaben (${completed} erledigt)`;
+    document.getElementById('taskCount').textContent = `${openTasks} offene Aufgaben (${completed} erledigt)`;
   }
-</script>
-<script>(function () {
-  function c() {
-    var b = a.contentDocument || a.contentWindow.document;
-    if (b) {
-      var d = b.createElement('script');
-      d.innerHTML = "window.__CF$cv$params={r:'966c5dcf127bb86d',t:'MTc1Mzc4OTQ4OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";
-      b.getElementsByTagName('head')[0].appendChild(d)
+
+  function openTaskModal(taskId) {
+    const task = tasks.find(t => t.id === taskId);
+    if (!task) return;
+
+    const priorityColors = {
+      low: 'border-l-blue-500',
+      medium: 'border-l-green-500',
+      high: 'border-l-red-500'
+    };
+
+    const priorityIcons = {
+      low: '🔵',
+      medium: '🟢',
+      high: '🔴'
+    };
+
+    const modalContent = `
+            <div class="bg-white border-l-4 ${priorityColors[task.priority]} rounded-xl p-5 ${task.completed
+      ? 'opacity-75' : ''}">
+                <!-- Header -->
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex items-center space-x-3 flex-1">
+                        <button onclick="toggleTaskFromModal(${task.id})"
+                                class="w-6 h-6 rounded-full border-2 ${task.completed
+      ? 'bg-green-500 border-green-500 text-white' : 'border-gray-300 hover:border-blue-400'} flex items-center justify-center transition-colors duration-200 flex-shrink-0">
+                            ${task.completed ? '✓' : ''}
+                        </button>
+                        <h3 class="text-lg font-semibold ${task.completed
+      ? 'line-through text-gray-500' : 'text-gray-900'} leading-tight">${task.name || task.title}</h3>
+                    </div>
+                    <button onclick="closeTaskModal()"
+                            class="p-2 text-gray-400 hover:text-gray-600 transition-colors duration-200">
+                        ✕
+                    </button>
+                </div>
+
+                ${task.name && task.title !== task.name ? `
+                <div class="mb-4 p-3 bg-gray-50 rounded-lg">
+                    <div class="text-sm text-gray-600 mb-1">Aufgabe:</div>
+                    <div class="font-medium text-gray-900">${task.title}</div>
+                </div>
+                ` : ''}
+
+                <!-- Status Badge -->
+                <div class="mb-4">
+                    <span class="px-3 py-1 text-sm font-medium rounded-full ${task.priority
+    === 'high' ? 'bg-red-100 text-red-700' : task.priority === 'medium'
+      ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}">
+                        ${priorityIcons[task.priority]} ${task.priority === 'low' ? 'Offen'
+      : task.priority === 'medium' ? 'Geplant' : 'Dringend'}
+                    </span>
+                    ${task.completed
+      ? '<span class="ml-2 px-3 py-1 text-sm font-medium rounded-full bg-green-100 text-green-700">✅ Erledigt</span>'
+      : ''}
+                </div>
+
+                <!-- Adresse und Kontakt -->
+                <div class="bg-gray-50 rounded-lg p-3 mb-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center space-x-2 text-gray-700">
+                            <span class="text-blue-500">📍</span>
+                            <span class="font-medium">${task.location}</span>
+                        </div>
+                    </div>
+                    ${task.fullAddress ? `
+                    <div class="text-xs text-gray-500 mt-2 pl-6">
+                        ${task.fullAddress}
+                    </div>
+                    ` : ''}
+                    ${task.phone ? `
+                    <div class="flex items-center space-x-2 mt-3">
+                        <button onclick="makePhoneCall('${task.phone}')"
+                                class="flex items-center space-x-1 px-3 py-1 bg-green-500 text-white rounded-full hover:bg-green-600 transition-colors duration-200 text-sm">
+                            <span>📞</span>
+                            <span>Anrufen</span>
+                        </button>
+                        <button onclick="openWhatsApp('${task.phone}')"
+                                class="flex items-center space-x-1 px-3 py-1 bg-green-500 text-white rounded-full hover:bg-green-600 transition-colors duration-200 text-sm">
+                            <span>💬</span>
+                            <span>WhatsApp</span>
+                        </button>
+                        <button onclick="copyToClipboard('${task.phone}')"
+                                class="flex items-center space-x-1 px-3 py-1 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors duration-200 text-sm">
+                            <span>📋</span>
+                            <span>${task.phone}</span>
+                        </button>
+                    </div>
+                    ` : ''}
+                </div>
+
+                <!-- Finanzielle Informationen -->
+                ${task.customerPrice > 0 || task.spareParts > 0 || task.earnings !== 0 ? `
+                <div class="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-3 mb-4">
+                    <div class="grid grid-cols-3 gap-3 text-center">
+                        ${task.customerPrice > 0 ? `
+                        <div class="bg-white rounded-lg p-2">
+                            <div class="text-xs text-gray-500 mb-1">Kundenpreis</div>
+                            <div class="font-bold text-green-600">💰 ${task.customerPrice.toFixed(2)} €</div>
+                        </div>
+                        ` : '<div></div>'}
+                        ${task.spareParts > 0 ? `
+                        <div class="bg-white rounded-lg p-2">
+                            <div class="text-xs text-gray-500 mb-1">Ersatzteile</div>
+                            <div class="font-bold text-orange-600">🔧 ${task.spareParts.toFixed(2)} €</div>
+                        </div>
+                        ` : '<div></div>'}
+                        ${task.earnings !== 0 ? `
+                        <div class="bg-white rounded-lg p-2">
+                            <div class="text-xs text-gray-500 mb-1">Einnahmen</div>
+                            <div class="font-bold text-${task.earnings >= 0 ? 'green'
+      : 'red'}-600">📈 ${task.earnings.toFixed(2)} €</div>
+                        </div>
+                        ` : '<div></div>'}
+                    </div>
+                </div>
+                ` : ''}
+
+                <!-- Zeitstempel -->
+                <div class="bg-white border rounded-lg p-3 mb-4">
+                    <div class="grid grid-cols-1 gap-2 text-xs text-gray-500">
+                        <div class="flex items-center justify-between">
+                            <span>📅 Erstellt:</span>
+                            <span class="font-medium">${task.createdAt}</span>
+                        </div>
+                        ${task.plannedDate ? `
+                        <div class="flex items-center justify-between">
+                            <span>📋 Geplant für:</span>
+                            <span class="font-medium text-blue-600">${new Date(
+      task.plannedDate).toLocaleDateString('de-DE')}</span>
+                        </div>
+                        ` : ''}
+                        ${task.completedAt ? `
+                        <div class="flex items-center justify-between">
+                            <span>✅ Erledigt am:</span>
+                            <span class="font-medium text-green-600">${task.completedAt}</span>
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+
+                <!-- Aktionen -->
+                <div class="flex items-center justify-between space-x-3">
+                    <button onclick="openNavigation([${task.coordinates[0]}, ${task.coordinates[1]}], '${task.location}')"
+                            class="flex items-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 font-medium flex-1">
+                        <span>🧭</span>
+                        <span>Navigation</span>
+                    </button>
+
+                    <button onclick="editTaskFromModal(${task.id})"
+                            class="flex items-center space-x-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors duration-200 font-medium flex-1">
+                        <span>✏️</span>
+                        <span>Bearbeiten</span>
+                    </button>
+
+                    <button onclick="deleteTaskFromModal(${task.id})"
+                            class="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors duration-200" title="Löschen">
+                        🗑️
+                    </button>
+                </div>
+            </div>
+        `;
+
+    document.getElementById('taskModalContent').innerHTML = modalContent;
+    document.getElementById('taskModal').classList.remove('hidden');
+  }
+
+  function closeTaskModal() {
+    document.getElementById('taskModal').classList.add('hidden');
+  }
+
+  function toggleTaskFromModal(taskId) {
+    toggleTask(taskId);
+    // Refresh modal content
+    openTaskModal(taskId);
+    // Update the current view
+    updateTaskDisplay();
+  }
+
+  function editTaskFromModal(taskId) {
+    closeTaskModal();
+    editTask(taskId);
+  }
+
+  function deleteTaskFromModal(taskId) {
+    if (confirm('Aufgabe wirklich löschen?')) {
+      tasks = tasks.filter(t => t.id !== taskId);
+      saveTasksToStorage();
+      closeTaskModal();
+      updateTaskDisplay();
     }
   }
 
-  if (document.body) {
-    var a = document.createElement('iframe');
-    a.height = 1;
-    a.width = 1;
-    a.style.position = 'absolute';
-    a.style.top = 0;
-    a.style.left = 0;
-    a.style.border = 'none';
-    a.style.visibility = 'hidden';
-    document.body.appendChild(a);
-    if ('loading'
-      !== document.readyState) {
-      c();
-    } else if (window.addEventListener) {
-      document.addEventListener(
-        'DOMContentLoaded', c);
-    } else {
-      var e = document.onreadystatechange || function () {
-      };
-      document.onreadystatechange = function (b) {
-        e(b);
-        'loading' !== document.readyState && (document.onreadystatechange = e, c())
-      }
+  // Close modal when clicking outside
+  document.addEventListener('click', function(event) {
+    const modal = document.getElementById('taskModal');
+    if (event.target === modal) {
+      closeTaskModal();
     }
-  }
-})();</script>
-</body>
+  });
+
+  // Close modal with Escape key
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+      closeTaskModal();
+    }
+  });
+</script>
+
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'967563bfa4fcdcf8',t:'MTc1Mzg4NDEwMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
